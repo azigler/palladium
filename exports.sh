@@ -18,7 +18,6 @@ export PALLADIUM_MATTERMOST_POSTGRES_USER="mattermost_user"
 export PALLADIUM_MATTERMOST_POSTGRES_PASSWORD="mattermost_password"
 
 # nextcloud
-export PALLADIUM_NEXTCLOUD_PASSWORD="nextcloud_password"
 export PALLADIUM_MARIADB_NEXTCLOUD_USER="nextcloud_user"
 export PALLADIUM_MARIADB_NEXTCLOUD_PASSWORD="nextcloud_password"
 
@@ -32,6 +31,5 @@ export PALLADIUM_POSTMASTER_PASSWORD="postmaster_password"
 export PALLADIUM_CLOUDFLARE_TOKEN="your-token-here"
 
 # wikijs
-export PALLADIUM_WIKIJS_PASSWORD="wikijs_password"
 export PALLADIUM_MARIADB_WIKIJS_USER="wikijs_user"
 export PALLADIUM_MARIADB_WIKIJS_PASSWORD="wikijs_password"
