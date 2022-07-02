@@ -39,11 +39,11 @@ services:
       - 587:587
       - 993:993
     volumes:
-      - $PALLADIUM_DIR/containers/mailserver/mail-data/:/var/mail/
-      - $PALLADIUM_DIR/containers/mailserver/mail-state/:/var/mail-state/
-      - $PALLADIUM_DIR/containers/mailserver/mail-logs/:/var/log/mail/
-      - $PALLADIUM_DIR/containers/mailserver/config/:/tmp/docker-mailserver/
-      - $PALLADIUM_DIR/containers/swag/config/etc/letsencrypt/archive/:/etc/letsencrypt/live/:ro
+      - $PALLADIUM_DIR/containers/mailserver/mail-data:/var/mail
+      - $PALLADIUM_DIR/containers/mailserver/mail-state:/var/mail-state
+      - $PALLADIUM_DIR/containers/mailserver/mail-logs:/var/log/mail
+      - $PALLADIUM_DIR/containers/mailserver/config:/tmp/docker-mailserver
+      - $PALLADIUM_DIR/containers/swag/config/etc/letsencrypt/archive:/etc/letsencrypt/live:ro
       - /etc/localtime:/etc/localtime:ro
   mattermost:
     container_name: mattermost
