@@ -2,6 +2,9 @@
 
 source ./exports.sh
 
+rm setup.sh.1
+rm mailserver.env.1
+
 mkdir -p $PALLADIUM_DIR/containers/swag/config/dns-conf/
 mkdir -p $PALLADIUM_DIR/containers/mariadb/config/initdb.d/
 mkdir -p $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/
