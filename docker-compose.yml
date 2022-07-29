@@ -50,7 +50,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
   mattermost:
     container_name: mattermost
-    image: mattermost/mattermost-team-edition:release-7.0
+    image: mattermost/mattermost-team-edition:latest
     restart: unless-stopped
     user: 0:0
     depends_on:
