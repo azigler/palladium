@@ -35,10 +35,10 @@ Easy-to-use `docker-compose.yml` to bootstrap a [Docker network](https://docs.do
     - **465**: ESMTP (implicit TLS)
     - **587**: ESMTP (explicit TLS to STARTTLS)
     - **993**: IMAP4 (implicit TLS)
-- **[mattermost](https://hub.docker.com/layers/mattermost-team-edition/mattermost/mattermost-team-edition/release-7.0/images/sha256-c8b1ab756155e36b8c9a97e41e90d23e35f12f3f6e15f05c18edb1c2e94a27cb?context=explore):** mattermost/mattermost-team-edition:release-7.0
+- **[mattermost](https://hub.docker.com/r/mattermost/mattermost-team-edition/tags):** mattermost/mattermost-team-edition:latest
 - **[mariadb](https://github.com/linuxserver/docker-mariadb):** lscr.io/linuxserver/mariadb:latest
 - **[nextcloud](https://github.com/linuxserver/docker-nextcloud):** lscr.io/linuxserver/nextcloud:latest
-- **[postgres](https://hub.docker.com/layers/postgres/library/postgres/latest/images/sha256-d3eecdd28512e721b10d6e270d4ede4cbd57706f0c5bf28ea1dc952eff325650?context=explore):** postgres:latest
+- **[postgres](https://hub.docker.com/_/postgres/tags):** postgres:latest
 - **[roundcube](https://github.com/roundcube/roundcubemail-docker):** roundcube/roundcubemail:latest
 - **[swag](https://github.com/linuxserver/docker-swag):** lscr.io/linuxserver/swag:latest
 - **[wikijs](https://github.com/linuxserver/docker-wikijs):** lscr.io/linuxserver/wikijs:latest
