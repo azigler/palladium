@@ -144,7 +144,7 @@ Example `PTR` record configuration in [Cloudflare](https://www.cloudflare.com/).
 ![](https://user-images.githubusercontent.com/7295363/176978730-19937143-5261-4268-b631-621718514aa9.png)
 
 Example `DKIM` configuration in [Cloudflare](https://www.cloudflare.com/). Replace `mygeneratedkeygoeshere==` with all of the content after `p=` in `containers/mailserver/config/opendkim/keys/example.com/mail.txt` (combining the lines between the quotes to create a single string):
-![](https://user-images.githubusercontent.com/7295363/176978742-8931ec0b-8cc2-4957-927d-5487a3c653a1.png)
+![](https://user-images.githubusercontent.com/7295363/202292950-f181fe7e-88a4-4f71-9ee5-d18626634e82.png)
 
 Example `SPF` configuration in [Cloudflare](https://www.cloudflare.com/). Replace `example.com` with your domain name and `your.ip.address.here` with your server's public IP address:
 ![](https://user-images.githubusercontent.com/7295363/176978757-d3cd08cc-37a1-42a2-8e41-0ec6cada5f29.png)
