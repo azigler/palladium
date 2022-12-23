@@ -2,41 +2,40 @@
 
 source ./exports.sh
 
-rm setup.sh.1
-rm mailserver.env.1
+cd containers/swag/config/etc/letsencrypt/archive/zigmoo.net
+CURRENT_NUMBER=$(ls -tp | grep -v /$ | head -1 | tr -dc '0-9')
+CERT="fullchain$CURRENT_NUMBER.pem"
+PRIVKEY="privkey$CURRENT_NUMBER.pem"
 
-mkdir -p $PALLADIUM_DIR/containers/swag/config/dns-conf/
-mkdir -p $PALLADIUM_DIR/containers/mariadb/config/initdb.d/
-mkdir -p $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/
-mkdir -p $PALLADIUM_DIR/containers/mailserver/config/
+cp $CERT $PALLADIUM_DIR/palladium-cert.pem
+cp $PRIVKEY $PALLADIUM_DIR/palladium-privkey.pem
 
-echo "dns_cloudflare_api_token = $PALLADIUM_CLOUDFLARE_TOKEN" > $PALLADIUM_DIR/containers/swag/config/dns-conf/cloudflare.ini
+if [[ $* == *--init* ]]; then
+  mkdir -p $PALLADIUM_DIR/containers/swag/config/dns-conf/
+  mkdir -p $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/
 
-echo "CREATE USER '$PALLADIUM_MARIADB_NEXTCLOUD_USER'@'nextcloud.$PALLADIUM_DOCKER_NETWORK' IDENTIFIED BY '$PALLADIUM_MARIADB_NEXTCLOUD_PASSWORD';
-CREATE DATABASE IF NOT EXISTS nextcloud CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-GRANT ALL PRIVILEGES on nextcloud.* to '$PALLADIUM_MARIADB_NEXTCLOUD_USER'@'nextcloud.$PALLADIUM_DOCKER_NETWORK';
-FLUSH privileges;" > $PALLADIUM_DIR/containers/mariadb/config/initdb.d/nextcloud.sql
+  echo "CREATE DATABASE mattermost;
+  CREATE USER $PALLADIUM_MATTERMOST_POSTGRES_USER WITH ENCRYPTED PASSWORD '$PALLADIUM_MATTERMOST_POSTGRES_PASSWORD';
+  ALTER USER $PALLADIUM_MATTERMOST_POSTGRES_USER WITH SUPERUSER;
+  GRANT ALL PRIVILEGES ON DATABASE mattermost TO $PALLADIUM_MATTERMOST_POSTGRES_USER;" > $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/mattermost.sql
 
-echo "CREATE USER '$PALLADIUM_MARIADB_WIKIJS_USER'@'wikijs.$PALLADIUM_DOCKER_NETWORK' IDENTIFIED BY '$PALLADIUM_MARIADB_WIKIJS_PASSWORD';
-CREATE DATABASE IF NOT EXISTS wikijs CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-GRANT ALL PRIVILEGES on wikijs.* to '$PALLADIUM_MARIADB_WIKIJS_USER'@'wikijs.$PALLADIUM_DOCKER_NETWORK';
-FLUSH privileges;" > $PALLADIUM_DIR/containers/mariadb/config/initdb.d/wikijs.sql
+  echo "CREATE DATABASE listmonk;
+  CREATE USER $PALLADIUM_LISTMONK_POSTGRES_USER WITH ENCRYPTED PASSWORD '$PALLADIUM_LISTMONK_POSTGRES_PASSWORD';
+  ALTER USER $PALLADIUM_LISTMONK_POSTGRES_USER WITH SUPERUSER;
+  GRANT ALL PRIVILEGES ON DATABASE listmonk TO $PALLADIUM_LISTMONK_POSTGRES_USER;" > $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/listmonk.sql
 
-echo "CREATE DATABASE mattermost;
-CREATE USER $PALLADIUM_MATTERMOST_POSTGRES_USER WITH ENCRYPTED PASSWORD '$PALLADIUM_MATTERMOST_POSTGRES_PASSWORD';
-GRANT ALL PRIVILEGES ON DATABASE mattermost TO $PALLADIUM_MATTERMOST_POSTGRES_USER;" > $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/mattermost.sql
+  echo "CREATE DATABASE wikijs;
+  CREATE USER $PALLADIUM_WIKIJS_POSTGRES_USER WITH ENCRYPTED PASSWORD '$PALLADIUM_WIKIJS_POSTGRES_PASSWORD';
+  ALTER USER $PALLADIUM_WIKIJS_POSTGRES_USER WITH SUPERUSER;
+  GRANT ALL PRIVILEGES ON DATABASE wikijs TO $PALLADIUM_WIKIJS_POSTGRES_USER;" > $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d/wikijs.sql
 
-wget https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh
-chmod a+x ./setup.sh
-
-wget https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/mailserver.env
-sed -i 's/SSL_TYPE=/SSL_TYPE=manual/' mailserver.env
-sed -i 's/ENABLE_FAIL2BAN=0/ENABLE_FAIL2BAN=1/' mailserver.env
-sed -i 's/TZ=/TZ=UTC/' mailserver.env
-sed -i 's/PERMIT_DOCKER=none/PERMIT_DOCKER=connected-networks/' mailserver.env
-sed -i "s/POSTMASTER_ADDRESS=/POSTMASTER_ADDRESS=$PALLADIUM_POSTMASTER_USER/" mailserver.env
-sed -i "s/SSL_CERT_PATH=/SSL_CERT_PATH=\/etc\/letsencrypt\/live\/$PALLADIUM_HOSTNAME\/fullchain1.pem/" mailserver.env
-sed -i "s/SSL_KEY_PATH=/SSL_KEY_PATH=\/etc\/letsencrypt\/live\/$PALLADIUM_HOSTNAME\/privkey1.pem/" mailserver.env
+  echo "dns_cloudflare_api_token = $PALLADIUM_CLOUDFLARE_TOKEN" > $PALLADIUM_DIR/containers/swag/config/dns-conf/cloudflare.ini
+fi
 
 docker compose pull
 docker compose up --detach --build --force-recreate
+
+if [[ $* == *--init* ]]; then
+  sleep 10
+  docker compose run listmonk ./listmonk --install --yes
+fi

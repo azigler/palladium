@@ -1,20 +1,15 @@
 .TODO
 .DS_Store
 
-mailserver.env
-setup.sh
-
 containers/**
 !containers/*
-
-!containers/mailserver/config
-!containers/mailserver/config/user-patches.sh
 
 !containers/swag/config
 !containers/swag/config/nginx
 !containers/swag/config/nginx/proxy-confs
-!containers/swag/config/nginx/proxy-confs/healthchecks.subdomain.conf
+!containers/swag/config/nginx/proxy-confs/listmonk.subdomain.conf
 !containers/swag/config/nginx/proxy-confs/mattermost.subdomain.conf
-!containers/swag/config/nginx/proxy-confs/nextcloud.subdomain.conf
-!containers/swag/config/nginx/proxy-confs/roundcube.subdomain.conf
-!containers/swag/config/nginx/proxy-confs/wikijs.subdomain.conf
+!containers/swag/config/nginx/proxy-confs/wiki.subdomain.conf
+
+palladium-cert.pem
+palladium-privkey.pem

@@ -4,50 +4,20 @@ networks:
   default:
     name: $PALLADIUM_DOCKER_NETWORK
 services:
-  healthchecks:
-    container_name: healthchecks
-    image: lscr.io/linuxserver/healthchecks:latest
+  listmonk:
+    container_name: listmonk
+    image: listmonk/listmonk:latest
     restart: unless-stopped
+    depends_on:
+      - postgres
     environment:
-      - PUID=1000
-      - PGID=1000
       - TZ=UTC
-      - DEBUG=False
-      - SITE_ROOT=https://healthchecks.$PALLADIUM_HOSTNAME
-      - SITE_NAME=Healthchecks
-      - DEFAULT_FROM_EMAIL=$PALLADIUM_POSTMASTER_USER
-      - EMAIL_HOST=$PALLADIUM_HOSTNAME
-      - EMAIL_PORT=$PALLADIUM_SMTP_PORT
-      - EMAIL_HOST_USER=$PALLADIUM_POSTMASTER_USER
-      - EMAIL_HOST_PASSWORD=$PALLADIUM_POSTMASTER_PASSWORD
-      - EMAIL_USE_TLS=True
-      - SUPERUSER_EMAIL=$PALLADIUM_ADMIN_EMAIL
-      - SUPERUSER_PASSWORD=$PALLADIUM_HEALTHCHECKS_PASSWORD
-    volumes:
-      - $PALLADIUM_DIR/containers/healthchecks/config:/config
-  mailserver:
-    container_name: mailserver
-    image: docker.io/mailserver/docker-mailserver:latest
-    hostname: zigmoo.net
-    env_file: mailserver.env
-    restart: unless-stopped
-    stop_grace_period: 1m
-    cap_add:
-      - NET_ADMIN
-      - SYS_PTRACE
-    ports:
-      - 25:25
-      - 143:143
-      - 465:465
-      - 587:587
-      - 993:993
-    volumes:
-      - $PALLADIUM_DIR/containers/mailserver/mail-data:/var/mail
-      - $PALLADIUM_DIR/containers/mailserver/mail-state:/var/mail-state
-      - $PALLADIUM_DIR/containers/mailserver/mail-logs:/var/log/mail
-      - $PALLADIUM_DIR/containers/mailserver/config:/tmp/docker-mailserver
-      - $PALLADIUM_DIR/containers/swag/config/etc/letsencrypt/archive:/etc/letsencrypt/live:ro
-      - /etc/localtime:/etc/localtime:ro
+      - LISTMONK_app__address=0.0.0.0:9000
+      - LISTMONK_app__admin_username=$PALLADIUM_LISTMONK_ADMIN_USER
+      - LISTMONK_app__admin_password=$PALLADIUM_LISTMONK_ADMIN_PASSWORD
+      - LISTMONK_db__host=postgres
+      - LISTMONK_db__user=$PALLADIUM_LISTMONK_POSTGRES_USER
+      - LISTMONK_db__password=$PALLADIUM_LISTMONK_POSTGRES_PASSWORD
   mattermost:
     container_name: mattermost
     image: mattermost/mattermost-team-edition:latest
@@ -66,30 +36,6 @@ services:
       - $PALLADIUM_DIR/containers/mattermost/logs:/mattermost/logs
       - $PALLADIUM_DIR/containers/mattermost/plugins:/mattermost/plugins
       - $PALLADIUM_DIR/containers/mattermost/client/plugins:/mattermost/client/plugins
-  mariadb:
-    container_name: mariadb
-    image: lscr.io/linuxserver/mariadb:latest
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - MYSQL_ROOT_PASSWORD=$PALLADIUM_MARIADB_ROOT_PASSWORD
-      - TZ=UTC
-    volumes:
-      - $PALLADIUM_DIR/containers/mariadb/config:/config
-  nextcloud:
-    container_name: nextcloud
-    image: lscr.io/linuxserver/nextcloud:latest
-    restart: unless-stopped
-    depends_on:
-      - mariadb
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=UTC
-    volumes:
-      - $PALLADIUM_DIR/containers/nextcloud/config:/config
-      - $PALLADIUM_DIR/containers/nextcloud/data:/data
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -100,18 +46,13 @@ services:
     volumes:
       - $PALLADIUM_DIR/containers/postgres/data:/var/lib/postgresql/data
       - $PALLADIUM_DIR/containers/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-  roundcube:
-    container_name: roundcube
-    image: roundcube/roundcubemail:latest
+  redis:
+    container_name: redis
+    image: redis:latest
     restart: unless-stopped
-    volumes:
-      - $PALLADIUM_DIR/containers/roundcube/www:/var/www/html
-      - $PALLADIUM_DIR/containers/roundcube/db/sqlite:/var/roundcube/db
-    environment:
-      - ROUNDCUBEMAIL_DB_TYPE=sqlite
-      - ROUNDCUBEMAIL_SKIN=elastic
-      - ROUNDCUBEMAIL_DEFAULT_HOST=tls://zigmoo.net
-      - ROUNDCUBEMAIL_SMTP_SERVER=tls://zigmoo.net
+    command: redis-server --save 60 1 --loglevel warning --requirepass $PALLADIUM_REDIS_PASSWORD
+    volumes: 
+      - $PALLADIUM_DIR/containers/redis/data:/data
   swag:
     container_name: swag
     image: lscr.io/linuxserver/swag:latest
@@ -136,15 +77,16 @@ services:
     image: lscr.io/linuxserver/wikijs:latest
     restart: unless-stopped
     depends_on:
-      - mariadb
+      - postgres
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=UTC
-      - DB_TYPE=mariadb
-      - DB_HOST=mariadb
-      - DB_USER=$PALLADIUM_MARIADB_WIKIJS_USER
-      - DB_PASS=$PALLADIUM_MARIADB_WIKIJS_PASSWORD
+      - DB_TYPE=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=$PALLADIUM_WIKIJS_POSTGRES_USER
+      - DB_PASS=$PALLADIUM_WIKIJS_POSTGRES_PASSWORD
       - DB_NAME=wikijs
     volumes:
       - $PALLADIUM_DIR/containers/wikijs/config:/config
