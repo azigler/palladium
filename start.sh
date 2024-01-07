@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./exports.sh
+source ./exports.sh - test
 
 cd containers/swag/config/etc/letsencrypt/archive/zigmoo.net
 CURRENT_NUMBER=$(ls -tp | grep -v /$ | head -1 | tr -dc '0-9')
